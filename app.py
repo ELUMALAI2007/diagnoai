@@ -8,36 +8,42 @@ from werkzeug.security import generate_password_hash, check_password_hash
 app = Flask(__name__)
 app.secret_key = 'super_secret_key_ml_project'
 
-# Base directory
+# -----------------------------
+# BASE PATH
+# -----------------------------
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+MODEL_DIR = os.path.join(BASE_DIR, 'models')
+
+os.makedirs(MODEL_DIR, exist_ok=True)
 
 # -----------------------------
-# AUTO MODEL TRAINING (FIXED)
+# AUTO TRAIN MODEL
 # -----------------------------
-model_path = os.path.join(BASE_DIR, 'models', 'symptom_rf_model.pkl')
+model_path = os.path.join(MODEL_DIR, 'symptom_rf_model.pkl')
 
 if not os.path.exists(model_path):
-    import train_model  # This will generate all models
+    import train_model
+    train_model.main()   # 🔥 Force training
 
 # -----------------------------
 # LOAD MODELS
 # -----------------------------
-with open(os.path.join(BASE_DIR, 'models', 'symptom_rf_model.pkl'), 'rb') as f:
+with open(os.path.join(MODEL_DIR, 'symptom_rf_model.pkl'), 'rb') as f:
     symptom_model = pickle.load(f)
 
-with open(os.path.join(BASE_DIR, 'models', 'symptoms_list.pkl'), 'rb') as f:
+with open(os.path.join(MODEL_DIR, 'symptoms_list.pkl'), 'rb') as f:
     symptoms_list = pickle.load(f)
 
-with open(os.path.join(BASE_DIR, 'models', 'symptom_label_encoder.pkl'), 'rb') as f:
+with open(os.path.join(MODEL_DIR, 'symptom_label_encoder.pkl'), 'rb') as f:
     symptom_le = pickle.load(f)
 
-with open(os.path.join(BASE_DIR, 'models', 'direct_best_model.pkl'), 'rb') as f:
+with open(os.path.join(MODEL_DIR, 'direct_best_model.pkl'), 'rb') as f:
     direct_model = pickle.load(f)
 
-with open(os.path.join(BASE_DIR, 'models', 'direct_scaler.pkl'), 'rb') as f:
+with open(os.path.join(MODEL_DIR, 'direct_scaler.pkl'), 'rb') as f:
     direct_scaler = pickle.load(f)
 
-with open(os.path.join(BASE_DIR, 'models', 'direct_label_encoder.pkl'), 'rb') as f:
+with open(os.path.join(MODEL_DIR, 'direct_label_encoder.pkl'), 'rb') as f:
     direct_le = pickle.load(f)
 
 # -----------------------------
@@ -69,24 +75,6 @@ init_db()
 def index():
     return redirect(url_for('login'))
 
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    if request.method == 'POST':
-        try:
-            conn = sqlite3.connect(os.path.join(BASE_DIR, 'database.db'))
-            c = conn.cursor()
-            c.execute("INSERT INTO users (username, password) VALUES (?, ?)",
-                      (request.form['username'],
-                       generate_password_hash(request.form['password'])))
-            conn.commit()
-            conn.close()
-            flash('Registered successfully', 'success')
-            return redirect(url_for('login'))
-        except:
-            flash('User exists', 'danger')
-
-    return render_template('register.html')
-
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -108,18 +96,13 @@ def login():
 
 @app.route('/dashboard')
 def dashboard():
-    if 'user_id' not in session:
-        return redirect(url_for('login'))
-    return render_template('dashboard.html', username=session['username'])
+    return render_template('dashboard.html', username=session.get('username', 'User'))
 
 # -----------------------------
 # SYMPTOM PREDICTION
 # -----------------------------
 @app.route('/predict_symptoms', methods=['GET', 'POST'])
 def predict_symptoms():
-    if 'user_id' not in session:
-        return redirect(url_for('login'))
-
     if request.method == 'POST':
         selected = request.form.getlist('symptoms')
 
@@ -130,7 +113,7 @@ def predict_symptoms():
 
         probs = symptom_model.predict_proba([input_data])[0]
 
-        # RULE BOOST
+        # Rule boost
         if 'chest_pain' in selected and 'sweating' in selected:
             for i, d in enumerate(symptom_le.classes_):
                 if "heart" in d.lower():
@@ -140,12 +123,10 @@ def predict_symptoms():
 
         top = np.argsort(probs)[::-1][:3]
 
-        results = []
-        for i in top:
-            results.append({
-                "disease": symptom_le.inverse_transform([i])[0],
-                "probability": round(probs[i] * 100, 2)
-            })
+        results = [{
+            "disease": symptom_le.inverse_transform([i])[0],
+            "probability": round(probs[i] * 100, 2)
+        } for i in top]
 
         return render_template('result.html', results=results)
 
@@ -157,7 +138,7 @@ def predict_symptoms():
 @app.route('/predict_disease', methods=['GET', 'POST'])
 def predict_disease():
     if request.method == 'POST':
-        data = np.array([[
+        data = np.array([[ 
             float(request.form['age']),
             float(request.form['gender']),
             float(request.form['bp_systolic']),
