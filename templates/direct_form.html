@@ -1,0 +1,101 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="row text-center mb-4" data-aos="fade-down">
+    <div class="col-12">
+        <h2 class="fw-bold text-success"><i class="fa-solid fa-heart-pulse me-2"></i>Direct Risk Prediction</h2>
+        <p class="text-muted">Enter your medical vitals to predict major health risks.</p>
+    </div>
+</div>
+
+<div class="row justify-content-center" data-aos="fade-up">
+    <div class="col-12 col-md-10 col-lg-8">
+        <div class="card p-4 p-md-5 border-top border-success border-4">
+            <form method="POST" action="{{ url_for('predict_disease') }}">
+                
+                <div class="row g-4 mb-4">
+                    <div class="col-12 col-md-6">
+                        <div class="input-group drop-shadow-sm">
+                            <span class="input-group-text bg-light text-success border-end-0"><i class="fa-solid fa-user"></i></span>
+                            <div class="form-floating flex-grow-1">
+                                <input type="number" step="1" class="form-control border-start-0 ps-0" id="age" name="age" placeholder="Age" required>
+                                <label for="age">Age (Years)</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-12 col-md-6">
+                        <div class="input-group drop-shadow-sm">
+                            <span class="input-group-text bg-light text-success border-end-0"><i class="fa-solid fa-venus-mars"></i></span>
+                            <div class="form-floating flex-grow-1 d-flex align-items-center border border-start-0 rounded-end px-3">
+                                <select class="form-select border-0 ps-0" id="gender" name="gender" required>
+                                    <option value="" disabled selected>Select Gender</option>
+                                    <option value="1">Male</option>
+                                    <option value="0">Female</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-4 mb-4">
+                    <div class="col-md-6">
+                        <div class="input-group drop-shadow-sm">
+                            <span class="input-group-text bg-light text-success border-end-0"><i class="fa-solid fa-heart-circle-bolt"></i></span>
+                            <div class="form-floating flex-grow-1">
+                                <input type="number" step="1" class="form-control border-start-0 ps-0" id="bp" name="bp_systolic" placeholder="Systolic BP" required>
+                                <label for="bp">Blood Pressure (Systolic)</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="input-group drop-shadow-sm">
+                            <span class="input-group-text bg-light text-success border-end-0"><i class="fa-solid fa-droplet"></i></span>
+                            <div class="form-floating flex-grow-1">
+                                <input type="number" step="1" class="form-control border-start-0 ps-0" id="sugar" name="sugar" placeholder="Sugar Level" required>
+                                <label for="sugar">Blood Sugar Level</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-4 mb-4">
+                    <div class="col-12 col-md-4">
+                        <div class="input-group drop-shadow-sm">
+                            <span class="input-group-text bg-light text-success border-end-0"><i class="fa-solid fa-burger"></i></span>
+                            <div class="form-floating flex-grow-1">
+                                <input type="number" step="1" class="form-control border-start-0 ps-0" id="cholesterol" name="cholesterol" placeholder="Cholesterol" required>
+                                <label for="cholesterol">Cholesterol</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <div class="input-group drop-shadow-sm">
+                            <span class="input-group-text bg-light text-success border-end-0"><i class="fa-solid fa-weight-scale"></i></span>
+                            <div class="form-floating flex-grow-1">
+                                <input type="number" step="0.1" class="form-control border-start-0 ps-0" id="bmi" name="bmi" placeholder="BMI" required>
+                                <label for="bmi">BMI</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <div class="input-group drop-shadow-sm">
+                            <span class="input-group-text bg-light text-success border-end-0"><i class="fa-solid fa-heart-pulse"></i></span>
+                            <div class="form-floating flex-grow-1">
+                                <input type="number" step="1" class="form-control border-start-0 ps-0" id="heart_rate" name="heart_rate" placeholder="Heart Rate" required>
+                                <label for="heart_rate">Heart Rate</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn btn-gradient-success w-100 py-3 mt-4 text-uppercase fw-bold">
+                    <i class="fa-solid fa-clipboard-check me-2"></i> Predict Health Risk
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

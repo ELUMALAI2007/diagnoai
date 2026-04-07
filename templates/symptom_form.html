@@ -1,0 +1,81 @@
+{% extends "layout.html" %}
+{% block extra_head %}
+<!-- Select2 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<style>
+    .select2-container--default .select2-selection--multiple {
+        border-radius: 10px;
+        border: 1px solid #e0e0e0;
+        padding: 8px;
+        min-height: 50px;
+    }
+    .select2-container--default.select2-container--focus .select2-selection--multiple {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 0.25rem rgba(30,136,229,0.2);
+    }
+    .select2-container--default .select2-selection--multiple .select2-selection__choice {
+        background-color: var(--primary);
+        color: white;
+        border: none;
+        border-radius: 6px;
+        padding: 5px 10px;
+        margin-top: 5px;
+    }
+    .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+        color: white;
+        margin-right: 8px;
+        border-right: 1px solid rgba(255,255,255,0.3);
+    }
+    .select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover {
+        background-color: transparent;
+        color: #ffcdd2;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row text-center mb-4" data-aos="fade-down">
+    <div class="col-12">
+        <h2 class="fw-bold text-primary"><i class="fa-solid fa-brain me-2"></i>Symptom-Based Prediction</h2>
+        <p class="text-muted">Select all symptoms you are currently experiencing.</p>
+    </div>
+</div>
+
+<div class="row justify-content-center" data-aos="zoom-in">
+    <div class="col-12 col-md-8 col-lg-7">
+        <div class="card p-4 p-md-5">
+            <form method="POST" action="{{ url_for('predict_symptoms') }}">
+                <div class="mb-4">
+                    <label for="symptoms" class="form-label fw-bold text-dark">Search & Select Symptoms</label>
+                    <div class="form-group shadow-sm rounded">
+                        <select class="form-select select2-multiple" name="symptoms" id="symptoms" multiple="multiple" style="width: 100%;" required>
+                            {% for sym in symptoms %}
+                                <option value="{{ sym }}">{{ sym.replace('sym_', '').replace('_', ' ').title() }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <small class="text-muted mt-2 d-block"><i class="fa-solid fa-circle-info text-primary"></i> You can search and select multiple symptoms for higher accuracy.</small>
+                </div>
+                
+                <button type="submit" class="btn btn-gradient-primary w-100 py-3 mt-4 text-uppercase">
+                    Analyze Symptoms <i class="fa-solid fa-arrow-right ms-2"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('.select2-multiple').select2({
+            placeholder: "e.g., Headache, Fever, Cough...",
+            allowClear: true,
+            width: 'resolve'
+        });
+    });
+</script>
+{% endblock %}

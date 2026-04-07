@@ -1,0 +1,94 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="row justify-content-center mt-3 mt-md-5" data-aos="fade-up">
+    <div class="col-12 col-md-10 col-lg-9">
+        <div class="card p-4 p-md-5">
+            <h2 class="text-center mb-5 fw-bold">
+                {% if pred_type == 'symptom' %}
+                    <i class="fa-solid fa-file-medical text-primary me-2"></i> Diagnostics Report
+                {% else %}
+                    <i class="fa-solid fa-file-medical-alt text-success me-2"></i> Direct Risk Analysis
+                {% endif %}
+            </h2>
+
+            {% if pred_type == 'symptom' %}
+                <p class="text-center text-muted mb-4 fs-5">Based on your compiled symptoms, our AI algorithm predicts the following conditions:</p>
+                
+                <div class="d-flex flex-column gap-4">
+                    {% for res in results %}
+                        {% set risk_color = 'danger' if res.probability >= 60 else 'warning' if res.probability >= 30 else 'success' %}
+                        {% set risk_level = 'High Risk' if res.probability >= 60 else 'Medium Risk' if res.probability >= 30 else 'Low Risk' %}
+                        
+                        <div class="card border-0 shadow-sm" style="background-color: #f8fbff; border-left: 5px solid var(--bs-{{ risk_color }}) !important;">
+                            <div class="card-body p-4">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h3 class="fw-bold mb-0 text-dark">
+                                        <span class="badge bg-{{ risk_color }} rounded-pill me-2 fs-6 pb-2">#{{ loop.index }}</span> 
+                                        {{ res.disease }}
+                                    </h3>
+                                    <div class="text-end">
+                                        <h4 class="mb-0 fw-bold text-{{ risk_color }}">{{ res.probability }}%</h4>
+                                        <small class="text-muted fw-bold">{{ risk_level }}</small>
+                                    </div>
+                                </div>
+                                
+                                <div class="progress mb-3" style="height: 12px; border-radius: 10px;">
+                                    <div class="progress-bar progress-bar-striped progress-bar-animated bg-{{ risk_color }}" role="progressbar" style="width: {{ res.probability }}%;" aria-valuenow="{{ res.probability }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                                
+                                <p class="mb-0 text-muted fs-6"><i class="fa-solid fa-user-doctor me-2 text-{{ risk_color }}"></i> <strong>AI Suggestion:</strong> {{ res.suggestion }}</p>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                
+            {% else %}
+                <p class="text-center text-muted mb-4 fs-5">Evaluating your medical vitals yields the following primary risk factor:</p>
+                
+                {% set risk_prob = results[0].probability %}
+                {% set risk_color = 'danger' if risk_prob >= 60 else 'warning' if risk_prob >= 30 else 'success' %}
+                {% set risk_level = 'High' if risk_prob >= 60 else 'Medium' if risk_prob >= 30 else 'Low' %}
+                
+                <div class="card border-0 shadow-lg text-center p-4 p-md-5" style="background-color: #f8fbff; border-top: 5px solid var(--bs-{{ risk_color }}) !important;">
+                    <div class="mb-4">
+                        {% if risk_prob >= 60 %}
+                            <i class="fa-solid fa-triangle-exclamation text-danger" style="font-size: 4rem;"></i>
+                        {% elif risk_prob >= 30 %}
+                            <i class="fa-solid fa-circle-exclamation text-warning" style="font-size: 4rem;"></i>
+                        {% else %}
+                            <i class="fa-solid fa-shield-check text-success" style="font-size: 4rem;"></i>
+                        {% endif %}
+                    </div>
+                    
+                    <h2 class="display-5 fw-bold text-dark mb-3">{{ results[0].disease }}</h2>
+                    <h3 class="fw-bold text-{{ risk_color }} mb-2">{{ risk_prob }}% Risk Factor</h3>
+                    <p class="text-muted fw-bold fs-5 mb-4">Risk Level: {{ risk_level }}</p>
+                    
+                    <div class="progress mb-4 w-75 mx-auto" style="height: 15px; border-radius: 10px;">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-{{ risk_color }}" role="progressbar" style="width: {{ risk_prob }}%;" aria-valuenow="{{ risk_prob }}" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                </div>
+            {% endif %}
+
+            <div class="card mt-5 bg-light border-0 shadow-sm rounded-4">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold text-primary mb-3"><i class="fa-solid fa-shield-halved me-2"></i> General Medical Protocol</h5>
+                    <ul class="text-muted mb-0">
+                        <li class="mb-2">Always consult a certified medical professional for an accurate diagnosis and treatment plan.</li>
+                        <li class="mb-2">Maintain a balanced diet rich in essential nutrients and stay adequately hydrated.</li>
+                        <li class="mb-2">Ensure regular cardiovascular activity, proper rest, and monitor your vitals if you have chronic conditions.</li>
+                    </ul>
+                    <hr>
+                    <small class="text-danger fw-bold"><i class="fa-solid fa-circle-info"></i> Disclaimer: DiagnoAI is an advanced educational machine learning tool and strictly does not replace professional clinical advice or screening.</small>
+                </div>
+            </div>
+
+            <div class="text-center mt-5">
+                <a href="{{ url_for('dashboard') }}" class="btn btn-outline-primary btn-lg rounded-pill px-5 fw-bold">
+                    <i class="fa-solid fa-arrow-left me-2"></i> Return to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="row mb-5 text-center position-relative" data-aos="fade-down">
+    <!-- Animated Medical Background Blobs -->
+    <div class="hero-blob"></div>
+    <div class="hero-blob-2"></div>
+    
+    <div class="col-12 z-1">
+        <h1 class="fw-bold text-primary mb-2 display-4">Welcome, {{ username | upper }} 👋</h1>
+        <p class="lead text-muted fs-4">Your intelligent health assistant powered by AI</p>
+        <p class="tagline">Predict Early. Live Better.</p>
+    </div>
+</div>
+
+<div class="row justify-content-center g-4">
+    <div class="col-12 col-md-6 col-lg-5" data-aos="fade-right" data-aos-delay="100">
+        <div class="card h-100 hover-card p-4 p-md-5 text-center">
+            <div class="mb-4">
+                <i class="fa-solid fa-brain" style="font-size: 5rem; color: var(--primary);"></i>
+            </div>
+            <h3 class="fw-bold mb-3">Symptom-Based Prediction</h3>
+            <p class="text-muted mb-4">Analyze complex symptom combinations to instantly predict over 200 possible medical conditions using our advanced Random Forest Engine.</p>
+            <a href="{{ url_for('predict_symptoms') }}" class="btn btn-gradient-primary btn-lg mt-auto w-100">
+                <i class="fa-solid fa-stethoscope"></i> Start Prediction
+            </a>
+        </div>
+    </div>
+    
+    <div class="col-12 col-md-6 col-lg-5" data-aos="fade-left" data-aos-delay="200">
+        <div class="card h-100 hover-card p-4 p-md-5 text-center">
+            <div class="mb-4">
+                <i class="fa-solid fa-heart-pulse" style="font-size: 5rem; color: var(--secondary);"></i>
+            </div>
+            <h3 class="fw-bold mb-3">Direct Disease Prediction</h3>
+            <p class="text-muted mb-4">Input your vital statistics (Blood Pressure, BMI, Sugar level, etc.) to assess risk factors immediately for chronic diseases using Logistic Regression.</p>
+            <a href="{{ url_for('predict_disease') }}" class="btn btn-gradient-success btn-lg mt-auto w-100">
+                <i class="fa-solid fa-chart-line"></i> Check Risk
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
